@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+  server:
+    build: .
+    container_name: "vehicle_server"
+    restart: on-failure
+    ports:
+      - 8000:8000
+    command: "uvicorn run:app --host 127.0.0.1 --port 8000"
+    links:
+      - database
+      - redis
+    depends_on:
+      - redis
+      - database
+  database:
+    image: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USERNAME: postgres
+      POSTGRES_DBNAME: vehicles
+    ports:
+     - 5433:5432
+  redis:
+    image: "redis:alpine"
+    restart: on-failure
+    ports:
+     - 6380:6379
+    environment:
+     - REDIS_REPLICATION_MODE=master
